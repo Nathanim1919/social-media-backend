@@ -9,9 +9,10 @@ const app = express()
 
 
 // database connection
-mongoose.connect('mongodb://127.0.0.1:27017/BlogPost')
+mongoose.connect('mongodb+srv://nathan:nathanim1919@cluster0.3w1trth.mongodb.net/blogPost?retryWrites=true&w=majority')
     .then(() => console.log('connected'))
     .catch((err) => console.log(err))
+
 
 // cross-origin-resource sharing middleware configuration
 // so as to able to set  ['https://localhost:3000'], which means that requests from that origin will be allowed.
