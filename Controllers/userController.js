@@ -69,13 +69,17 @@ module.exports.updateLikes = async (req, res) => {
 
 
         await updatedPost.save();
-        const notify = new Notification({
-            sender: user._id,
-            receiver: updatedPost.createdBy._id,
-            type: "like"
-        })
 
-        await notify.save();
+        if (user._id != updatedPost.createdBy._id) {
+
+            const notify = new Notification({
+                sender: user._id,
+                receiver: updatedPost.createdBy._id,
+                type: "like"
+            })
+
+            await notify.save();
+        }
 
         res.json(updatedPost);
     } catch (error) {
