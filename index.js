@@ -21,6 +21,12 @@ app.use(cors({
     methods: ['GET', 'HEAD', 'PUT', 'POST', 'DELETE'],
     credentials: true,
 }));
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "https://socia-jgr7.onrender.com");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
 
 app.use(bodyParser.json({
     limit: '50mb'
