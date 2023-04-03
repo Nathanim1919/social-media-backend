@@ -17,7 +17,7 @@ mongoose.connect('mongodb+srv://nathan:nathanim1919@cluster0.3w1trth.mongodb.net
 // cross-origin-resource sharing middleware configuration
 // so as to able to set  ['https://localhost:3000'], which means that requests from that origin will be allowed.
 app.use(cors({
-    origin: ['http://localhost:3000'],
+    origin: ['https://social-app-ukv1.onrender.com'],
     methods: ['GET', 'HEAD', 'PUT', 'POST', 'DELETE'],
     credentials: true,
 }));
