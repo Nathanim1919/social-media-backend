@@ -7,25 +7,30 @@ const authRouter = require('./Routers/authRouter.js');
 const postRouter = require('./Routers/postRouter.js');
 const app = express()
 
+const http = require('http');
+const server = http.createServer(app);
+const { Server } = require("socket.io");
+const io = new Server(server)
+
 
 // database connection
-mongoose.connect('mongodb+srv://nathan:nathanim1919@cluster0.3w1trth.mongodb.net/blogPost?retryWrites=true&w=majority')
-    .then(() => console.log('connected'))
-    .catch((err) => console.log(err))
+mongoose.connect('mongodb://127.0.0.1:27017/BlogPost', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+
+.then(() => console.log('connected'))
+.catch((err) => console.log(err))
+// mongoose.connect('mongodb+srv://nathan:nathanim1919@cluster0.3w1trth.mongodb.net/blogPost?retryWrites=true&w=majority')
 
 
 // cross-origin-resource sharing middleware configuration
 // so as to able to set  ['https://localhost:3000'], which means that requests from that origin will be allowed.
 app.use(cors({
-    origin: ['https://social-app-ukv1.onrender.com'],
+    origin: ['http://localhost:3000'],
     methods: ['GET', 'HEAD', 'PUT', 'POST', 'DELETE'],
     credentials: true,
 }));
-app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "https://socia-jgr7.onrender.com");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-});
 
 
 app.use(bodyParser.json({
@@ -44,6 +49,21 @@ app.use(express.json());
 app.use('/auth', authRouter);
 app.use('/user', userRouter);
 app.use('/posts', postRouter);
+
+
+// Socket.IO code
+io.on('connection', (socket) => {
+    console.log('a user connected');
+
+    socket.on('disconnect', () => {
+        console.log('user disconnected');
+    });
+
+    socket.on('chat message', (msg) => {
+        console.log('message: ' + msg);
+        io.emit('chat message', msg);
+    });
+});
 
 
 app.listen('5000',

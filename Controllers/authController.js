@@ -136,29 +136,29 @@ module.exports.register = async (req, res) => {
 
 
 module.exports.login = async (req, res) => {
-try {
-    const {
-        email,
-        password
-    } = req.body;
+    try {
+        const {
+            email,
+            password
+        } = req.body;
 
-    const user = await User.login(email, password);
-    const token = createToken(user._id);
+        const user = await User.login(email, password);
+        const token = createToken(user._id);
 
-    res.cookie('jwt', token, {
-        withCredentials: true,
-        httpOnly: false,
-        maxAge: maxAge * 1000,
-    });
-    res.status(200).json({
-        user: user._id,
-        created: true
-    })
-} catch (error) {
-    const errors = handleErrors(error);
-    res.json({
-        errors,
-        created: false
-    });
-}
+        res.cookie('jwt', token, {
+            withCredentials: true,
+            httpOnly: false,
+            maxAge: maxAge * 1000,
+        });
+        res.status(200).json({
+            user: user._id,
+            created: true
+        })
+    } catch (error) {
+        const errors = handleErrors(error);
+        res.json({
+            errors,
+            created: false
+        });
+    }
 }
