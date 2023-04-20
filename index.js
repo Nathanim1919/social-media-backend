@@ -2,16 +2,20 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const apicache = require('apicache');
 const userRouter = require('./Routers/userRouter.js');
 const authRouter = require('./Routers/authRouter.js');
 const postRouter = require('./Routers/postRouter.js');
 const app = express()
+
 
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server)
 
+let cache = apicache.middleware;
+app.use(cache('5 minutes'));
 
 // database connection
 mongoose.connect('mongodb://127.0.0.1:27017/BlogPost', {
@@ -30,7 +34,9 @@ app.use(cors({
     origin: ['http://localhost:3000'],
     methods: ['GET', 'HEAD', 'PUT', 'POST', 'DELETE'],
     credentials: true,
+    allowedHeaders: ['Content-Type'],
 }));
+
 
 
 app.use(bodyParser.json({

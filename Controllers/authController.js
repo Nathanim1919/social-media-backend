@@ -50,46 +50,7 @@ const handleErrors = (err) => {
     return errors;
 }
 
-
-
-
-module.exports.register = async (req, res) => {
-    await body('name').notEmpty().withMessage('Name is required.').run(req);
-    await body('email').isEmail().withMessage('Email is not valid.').run(req);
-    await body('password').isLength({
-        min: 8
-    }).withMessage('Password should be at least 8 characters long.').run(req);
-    await body('profesion').optional().isString().withMessage('Profession should be a string.').run(req);
-
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({
-            errors: errors.array()
-        });
-    }
-
-    const {
-        name,
-        email,
-        password,
-        profession,
-        profilepic
-    } = req.body;
-
-    const saltRounds = 10;
-    const salt = bcrypt.genSaltSync(saltRounds);
-    const hashedPassword = bcrypt.hashSync(password, salt);
-
-    const user = await User.create({
-        name,
-        email,
-        password: hashedPassword,
-        profession,
-        profile: profilepic
-    });
-
-    const token = createToken(user._id);
-
+function sendEmail(email, name) {
     // Send email
     const transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
@@ -121,18 +82,71 @@ module.exports.register = async (req, res) => {
             console.log('Email sent: ' + info.response);
         }
     });
+}
 
+
+function bcryptPassword(password) {
+    const saltRounds = 10;
+    const salt = bcrypt.genSaltSync(saltRounds);
+    const hashedPassword = bcrypt.hashSync(password, salt);
+    return hashedPassword;
+}
+
+
+// Utility function for creating and setting a JWT token as a cookie
+const setAuthToken = (res, token) => {
     res.cookie('jwt', token, {
         withCredentials: true,
         httpOnly: false,
         maxAge: maxAge * 1000,
     });
+};
+
+module.exports.register = async (req, res) => {
+    await body('name').notEmpty().withMessage('Name is required.').run(req);
+    await body('email').isEmail().withMessage('Email is not valid.').run(req);
+    await body('password').isLength({
+        min: 8
+    }).withMessage('Password should be at least 8 characters long.').run(req);
+    await body('profesion').optional().isString().withMessage('Profession should be a string.').run(req);
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({
+            errors: errors.array()
+        });
+    }
+
+    const {
+        name,
+        email,
+        password,
+        profession,
+        profilepic
+    } = req.body;
+
+    const user = await User.create({
+        name,
+        email,
+        password: bcryptPassword(password),
+        profession,
+        profile: profilepic
+    });
+
+
+    // Send email
+    // sendEmail(email, name);
+
+    // create and configure token
+    const token = createToken(user._id);
+    setAuthToken(res, token);
 
     res.status(201).json({
         user: user._id,
         created: true,
     });
 };
+
 
 
 module.exports.login = async (req, res) => {

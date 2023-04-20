@@ -43,6 +43,11 @@ const userSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Message'
     }],
+
+    stories:[{
+        type: Schema.Types.ObjectId,
+        ref: 'Story'
+    }],
     onlineStatus: {
         type: Boolean,
         default: false
