@@ -9,6 +9,9 @@ const {
     Comment
 } = require('../Models/comment');
 const Notification = require('../Models/notification');
+const {
+    Story
+} = require('../Models/story');
 
 module.exports.addPost = async (req, res) => {
     try {
@@ -119,6 +122,34 @@ module.exports.updateFollowing = async (req, res) => {
         res.status(500).send("Error updating user's following array");
     }
 };
+
+module.exports.getStorie = async (req, res) => {
+    try {
+        const stories = await Story.find().populate('user');
+        res.status(200).json(stories);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+module.exports.createStory = async (req, res) => {
+    try {
+        const {
+            profilepic
+        } = req.body
+        const {
+            id
+        } = req.params
+        const newStory = await Story.create({
+            image: profilepic,
+            user:id
+        })
+        await newStory.save()
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 module.exports.getNotifications = async (req, res) => {
     try {
         const {

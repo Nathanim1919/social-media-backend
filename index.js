@@ -14,8 +14,8 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server)
 
-let cache = apicache.middleware;
-app.use(cache('5 minutes'));
+// let cache = apicache.middleware;
+// app.use(cache('5 minutes'));
 
 // database connection
 mongoose.connect('mongodb://127.0.0.1:27017/BlogPost', {
