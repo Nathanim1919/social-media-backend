@@ -13,6 +13,15 @@ const {
     Story
 } = require('../Models/story');
 
+const {
+    Message
+} = require('../Models/messages')
+
+
+const {
+    Conversation
+} = require('../Models/conversations')
+
 module.exports.addPost = async (req, res) => {
     try {
         const {
@@ -142,7 +151,7 @@ module.exports.createStory = async (req, res) => {
         } = req.params
         const newStory = await Story.create({
             image: profilepic,
-            user:id
+            user: id
         })
         await newStory.save()
     } catch (error) {
@@ -314,5 +323,78 @@ module.exports.addComment = async (req, res) => {
 
     } catch (error) {
 
+    }
+}
+
+module.exports.sendMessage = async (req, res) => {
+    try {
+        const {
+            message,
+            id,
+            activeUserId
+        } = req.body;
+
+        // Check if conversation already exists between the two users
+        let conversation = await Conversation.findOne({
+            participants: {
+                $all: [id, activeUserId]
+            }
+        });
+
+        // If conversation not found, create a new one
+        if (!conversation) {
+            conversation = await Conversation.create({
+                participants: [id, activeUserId]
+            });
+        }
+
+        // Create a new message instance and associate it with the conversation
+        const newMessage = await Message.create({
+            content: message,
+            sender: id,
+            receiver: activeUserId,
+            conversation: conversation._id
+        });
+
+        conversation.messages.push(newMessage);
+        await conversation.save();
+
+        // await newMessage.save();
+
+        res.status(200).send({
+            success: true
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            error: 'Error creating new message'
+        });
+    }
+}
+
+module.exports.getConversation = async (req, res) => {
+    try {
+        const {
+            id
+        } = req.params
+
+       const {
+           activeUserId
+       } = req.query;
+        let conversation = await Conversation.findOne({
+            participants: {
+                $all: [id, activeUserId]
+            }
+        }).populate('participants')
+        .populate({
+            path: 'messages',
+            populate: {
+                path: 'sender'
+            } // populate the sender field of messages
+        });
+
+        res.status(200).json(conversation)
+    } catch (error) {
+        console.log(error)
     }
 }

@@ -7,10 +7,10 @@ const conversationSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     }],
-    latestMessage: {
-        type: Schema.Types.ObjectId,
+    messages: [{
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Message'
-    },
+    }],
     createdAt: {
         type: Date,
         default: Date.now,
@@ -18,4 +18,4 @@ const conversationSchema = new Schema({
     }
 })
 
-module.exports.conversation = mongoose.model('Conversation',conversationSchema);
+module.exports.Conversation = mongoose.model('Conversation', conversationSchema);

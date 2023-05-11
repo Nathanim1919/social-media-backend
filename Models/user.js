@@ -39,11 +39,7 @@ const userSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Conversation'
     }],
-    messages: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Message'
-    }],
-
+    
     stories: [{
         type: Schema.Types.ObjectId,
         ref: 'Story'
